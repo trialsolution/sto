@@ -3,7 +3,7 @@
 library(eurostat)
 library(tidyverse)
 library(xlsx)
-
+library(restatapi)
 
 #
 # Note that some 'milkitem' can be negative
@@ -24,19 +24,23 @@ apro_mk_pobta <- get_eurostat(id="apro_mk_pobta")
 apro_mk_pobta <- as_tibble(apro_mk_pobta)
 
 # convert the format of the dates (we only need years)
-apro_mk_pobta$time <-  as.numeric(format(apro_mk_pobta$time, format="%Y"))
+apro_mk_pobta$time <-  as.numeric(format(apro_mk_pobta$TIME_PERIOD, format="%Y"))
 
 # create a variable name by combining (geo,dairyprod,milkitem)
 # this will be used in the vlookup's in Excel...
 apro_mk_pobta <- apro_mk_pobta %>% mutate(varname = str_c(geo,dairyprod,milkitem, sep = "_"))
 
-# read the labels from agriprod.xls
-agriprod <- read.xlsx2(file = "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/Database/EUROSTAT monthly/new/agriprod.xls", 
-                sheetName = "agriprod", colIndex = 2:4, startRow = 4, header = TRUE)
+#get dictionary
+apro_mk_pobta_dic <- get_eurostat_dsd(id = "apro_mk_pobta")
+apro_mk_pobta_dic <- as_tibble(apro_mk_pobta_dic)
+
+dairyprod <- apro_mk_pobta_dic %>% filter(concept == "dairyprod")
+
+
 
 # merge to get the labels
-apro_mk_pobta <- apro_mk_pobta %>% left_join(agriprod, by = c("dairyprod"="ANIMALS"))
-apro_mk_pobta <- apro_mk_pobta %>% mutate(varlabel = str_c(geo,Live.animals,milkitem, sep = "_"))
+apro_mk_pobta <- apro_mk_pobta %>% left_join(dairyprod, by = c("dairyprod"="code"))
+apro_mk_pobta <- apro_mk_pobta %>% mutate(varlabel = str_c(geo,name,milkitem, sep = "_"))
 
 # select only the columns we need
 apro_mk_pobta <- apro_mk_pobta %>% select(varname,varlabel,dairyprod,milkitem,geo,time,values)
@@ -67,4 +71,4 @@ write.xlsx(timestamp, file = "apro_mk_pobta_fromR.xlsx",
 
 # save data extraction also in R data format
 save(apro_mk_pobta, file = "data/apro_mk_pobta.RData")
-save(agriprod, file = "data/agriprod.RData")
+save(apro_mk_pobta_dic, file = "data/apro_mk_pobta_dic.RData")
