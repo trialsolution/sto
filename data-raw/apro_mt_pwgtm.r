@@ -4,6 +4,7 @@
 library(eurostat)
 library(tidyverse)
 library(xlsx)
+library(restatapi)
 
 # PART I - Get the data
 #======================
@@ -16,12 +17,12 @@ get_apro_mt_pwgtm <- function(){
   apro_mt_pwgtm <- as_tibble(apro_mt_pwgtm)
   
   # get only the data after 2010
-  apro_mt_pwgtm$year <-  as.numeric(format(apro_mt_pwgtm$time, format="%Y"))
+  apro_mt_pwgtm$year <-  as.numeric(format(apro_mt_pwgtm$TIME_PERIOD, format="%Y"))
   apro_mt_pwgtm <- apro_mt_pwgtm %>% filter(year > 2009)
   apro_mt_pwgtm <- apro_mt_pwgtm %>% select(-year)
   
   # convert the format of the dates (we only need years)
-  apro_mt_pwgtm$time <-  format(apro_mt_pwgtm$time, format="%YM%m")
+  apro_mt_pwgtm$time <-  format(apro_mt_pwgtm$TIME_PERIOD, format="%YM%m")
   
   # drop meat item (always SL)
   apro_mt_pwgtm <-  apro_mt_pwgtm %>% select(-meatitem)
@@ -30,12 +31,15 @@ get_apro_mt_pwgtm <- function(){
   # this will be used in the vlookup's in Excel...
   apro_mt_pwgtm <- apro_mt_pwgtm %>% mutate(varname = str_c(geo,meat,unit, sep = "_"))
   
-  # read the labels originally coming from agriprod.xls
-  load(file = "data/agriprod.RData")
+  #get dictionary
+  apro_mt_pwgtm_dic <- get_eurostat_dsd(id = "apro_mt_pwgtm")
+  apro_mt_pwgtm_dic <- as_tibble(apro_mt_pwgtm_dic)
+  
+  mt_pwgtm_meat <- apro_mt_pwgtm_dic %>% filter(concept == "meat")  
   
   # merge to get the labels
-  apro_mt_pwgtm <- apro_mt_pwgtm %>% left_join(agriprod, by = c("meat"="ANIMALS"))
-  apro_mt_pwgtm <- apro_mt_pwgtm %>% mutate(varlabel = str_c(geo,Live.animals,unit, sep = "_"))
+  apro_mt_pwgtm <- apro_mt_pwgtm %>% left_join(mt_pwgtm_meat, by = c("meat"="code"))
+  apro_mt_pwgtm <- apro_mt_pwgtm %>% mutate(varlabel = str_c(geo,name,unit, sep = "_"))
   
   # select only the columns we need
   apro_mt_pwgtm <- apro_mt_pwgtm %>% select(geo,meat,unit,varlabel,time,values)

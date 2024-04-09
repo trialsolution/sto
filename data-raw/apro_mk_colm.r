@@ -2,6 +2,7 @@
 library(eurostat)
 library(tidyverse)
 library(xlsx)
+library(restatapi)
 
 # PART I - Get the data
 #======================
@@ -14,23 +15,26 @@ get_apro_mk_colm <- function(){
   apro_mk_colm <- as_tibble(apro_mk_colm)
   
   # get only the data after 2010
-  apro_mk_colm$year <-  as.numeric(format(apro_mk_colm$time, format="%Y"))
+  apro_mk_colm$year <-  as.numeric(format(apro_mk_colm$TIME_PERIOD, format="%Y"))
   apro_mk_colm <- apro_mk_colm %>% filter(year > 2009)
   apro_mk_colm <- apro_mk_colm %>% select(-year)
   
   # convert the format of the dates (we only need years)
-  apro_mk_colm$time <-  format(apro_mk_colm$time, format="%YM%m")
+  apro_mk_colm$time <-  format(apro_mk_colm$TIME_PERIOD, format="%YM%m")
   
   # create a variable name by combining (geo,dairyprod,milkitem)
   # this will be used in the vlookup's in Excel...
   apro_mk_colm <- apro_mk_colm %>% mutate(varname = str_c(geo,dairyprod,unit, sep = "_"))
   
-  # read the labels originally coming from agriprod.xls
-  load(file = "data/agriprod.RData")
+  #get dictionary
+  apro_mk_colm_dic <- get_eurostat_dsd(id = "apro_mk_colm")
+  apro_mk_colm_dic <- as_tibble(apro_mk_colm_dic)
   
+  mk_colm_dairyprod <- apro_mk_colm_dic %>% filter(concept == "dairyprod")
+    
   # merge to get the labels
-  apro_mk_colm <- apro_mk_colm %>% left_join(agriprod, by = c("dairyprod"="ANIMALS"))
-  apro_mk_colm <- apro_mk_colm %>% mutate(varlabel = str_c(geo,Live.animals,unit, sep = "_"))
+  apro_mk_colm <- apro_mk_colm %>% left_join(mk_colm_dairyprod, by = c("dairyprod"="code"))
+  apro_mk_colm <- apro_mk_colm %>% mutate(varlabel = str_c(geo,name, sep = "_"))
   
   # select only the columns we need
   apro_mk_colm <- apro_mk_colm %>% select(varname,varlabel,dairyprod,unit,geo,time,values)
