@@ -4,6 +4,9 @@ library(tidyverse)
 library(xlsx)
 library(restatapi)
 
+# output folder on U: drive
+extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2024_1/Eurostat download with R/"
+
 # PART I - Get the data
 #======================
 
@@ -71,22 +74,26 @@ write.xlsx(timestamp, file = "apro_mk_colm_fromR.xlsx",
 # save data extraction also in R data format
 # Add time stamp (day) to indicate the date of extraction
 #save(apro_mk_colm, file = "data/apro_mk_colm.RData")
-save(apro_mk_colm, file = paste("data/apro_mk_colm_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
+save(apro_mk_colm, file = paste(extraction_folder,"apro_mk_colm_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
 
 
 # PART II - Check for data updates at Eurostat server
 #====================================================
 
+rm(apro_mk_colm)
+
 # load the old file... 
 #load(file = "data/apro_mk_colm_2023-08-25.RData")
-load(file = "data/apro_mk_colm_2023-09-12.RData")
+load(file = paste(extraction_folder,"apro_mk_colm_2024-04-03.RData",sep = ""))
 old <- apro_mk_colm
+rm(apro_mk_colm)
 
 # then use the code above: go to Eurostat and grab the latest version
 # save the new apro_mk_colm dataset on 'new'
 #load(file = "data/apro_mk_colm_2023-09-12.RData")
-load(file = "data/apro_mk_colm_2023-09-18.RData")
+load(file = paste(extraction_folder,"apro_mk_colm_2024-04-13.RData",sep = ""))
 new <- apro_mk_colm
+rm(apro_mk_colm)
 
 # merge the old and the new versions and check what was updated
 x <- new %>% left_join(old, by = c("varname","varlabel","dairyprod","unit","geo","time"))
@@ -97,7 +104,7 @@ data_update3 <- x %>% filter(is.na(value.x)) %>% filter(!is.na(value.y))
 data_update <- rbind(data_update1, data_update2, data_update3)
 
 # save data update
-save(data_update, file = paste("data/apro_mk_colm_update", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
+save(data_update, file = paste(extraction_folder,"apro_mk_colm_update", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
 
 # clean up
 rm(data_update, data_update1, data_update3, data_update2, x, old, new)
