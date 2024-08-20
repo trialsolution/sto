@@ -5,7 +5,7 @@ library(xlsx)
 library(restatapi)
 
 # output folder on U: drive
-extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2024_1/Eurostat download with R/"
+extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2024_2/Eurostat download with R/"
 
 # PART I - Get the data
 #======================
@@ -61,13 +61,13 @@ apro_mk_colm <- get_apro_mk_colm()
 #! need a filter on years!! >2010
 excel_out <- apro_mk_colm %>% arrange(time) %>% pivot_wider(names_from = time)
 
-write.xlsx(as.data.frame(excel_out), file = "apro_mk_colm_fromR.xlsx", 
+write.xlsx(as.data.frame(excel_out), file = paste(extraction_folder,"apro_mk_colm_fromR.xlsx",sep = ""), 
            row.names = FALSE, col.names = TRUE, sheetName = "apro_mk_colm",
            showNA = TRUE)
 
 # add timestamp
 timestamp <- format(Sys.time(), "data extracted on %Y.%m.%d-%H:%M:%S")
-write.xlsx(timestamp, file = "apro_mk_colm_fromR.xlsx", 
+write.xlsx(timestamp, file = paste(extraction_folder,"apro_mk_colm_fromR.xlsx",sep = ""), 
            row.names = FALSE, col.names = TRUE, sheetName = "timestamp",
            showNA = TRUE, append = TRUE)
 
@@ -83,15 +83,13 @@ save(apro_mk_colm, file = paste(extraction_folder,"apro_mk_colm_", format(Sys.ti
 rm(apro_mk_colm)
 
 # load the old file... 
-#load(file = "data/apro_mk_colm_2023-08-25.RData")
-load(file = paste(extraction_folder,"apro_mk_colm_2024-04-03.RData",sep = ""))
+load(file = paste(extraction_folder,"apro_mk_colm_2024-07-02.RData",sep = ""))
 old <- apro_mk_colm
 rm(apro_mk_colm)
 
 # then use the code above: go to Eurostat and grab the latest version
 # save the new apro_mk_colm dataset on 'new'
-#load(file = "data/apro_mk_colm_2023-09-12.RData")
-load(file = paste(extraction_folder,"apro_mk_colm_2024-04-13.RData",sep = ""))
+load(file = paste(extraction_folder,"apro_mk_colm_2024-08-20.RData",sep = ""))
 new <- apro_mk_colm
 rm(apro_mk_colm)
 
