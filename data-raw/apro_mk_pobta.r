@@ -18,6 +18,8 @@ library(restatapi)
 # In our case it means that some dairy products yield skimmed milk, so the utilized skimmed milk is reported as a negative number
 #
 
+# output folder on U: drive
+extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2024_2/Eurostat download with R/"
 
 
 apro_mk_pobta <- get_eurostat(id="apro_mk_pobta")
@@ -35,7 +37,6 @@ apro_mk_pobta_dic <- get_eurostat_dsd(id = "apro_mk_pobta")
 apro_mk_pobta_dic <- as_tibble(apro_mk_pobta_dic)
 
 dairyprod <- apro_mk_pobta_dic %>% filter(concept == "dairyprod")
-
 
 
 # merge to get the labels
@@ -59,13 +60,13 @@ excel_out <- apro_mk_pobta %>% filter(time > 1989) %>% arrange(time) %>% pivot_w
 #write.xlsx2(as.data.frame(excel_out), file = "apro_mk_pobta_fromR.xlsx", row.names = FALSE, col.names = TRUE, sheetName = "apro_mk_pobta")
 
 # write to Excel 
-write.xlsx(as.data.frame(excel_out), file = "apro_mk_pobta_fromR.xlsx", 
+write.xlsx(as.data.frame(excel_out), file = paste(extraction_folder,"apro_mk_pobta_fromR.xlsx",sep = ""), 
             row.names = FALSE, col.names = TRUE, sheetName = "apro_mk_pobta",
             showNA = TRUE)
 
 # add timestamp
 timestamp <- format(Sys.time(), "data extracted on %Y.%m.%d-%H:%M:%S")
-write.xlsx(timestamp, file = "apro_mk_pobta_fromR.xlsx", 
+write.xlsx(timestamp, file = paste(extraction_folder,"apro_mk_pobta_fromR.xlsx",sep = ""), 
            row.names = FALSE, col.names = TRUE, sheetName = "timestamp",
            showNA = TRUE, append = TRUE)
 
