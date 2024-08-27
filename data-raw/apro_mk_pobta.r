@@ -71,5 +71,6 @@ write.xlsx(timestamp, file = paste(extraction_folder,"apro_mk_pobta_fromR.xlsx",
            showNA = TRUE, append = TRUE)
 
 # save data extraction also in R data format
-save(apro_mk_pobta, file = "data/apro_mk_pobta.RData")
-save(apro_mk_pobta_dic, file = "data/apro_mk_pobta_dic.RData")
+save(apro_mk_pobta, file = paste(extraction_folder,"apro_mk_pobta_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
+save(apro_mk_pobta_dic, file = paste(extraction_folder,"apro_mk_pobta_dic_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
+
