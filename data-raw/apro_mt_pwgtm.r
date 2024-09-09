@@ -6,6 +6,10 @@ library(tidyverse)
 library(xlsx)
 library(restatapi)
 
+# output folder on U: drive
+extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2024_2/Eurostat download with R/"
+
+
 # PART I - Get the data
 #======================
 
@@ -57,11 +61,14 @@ get_apro_mt_pwgtm <- function(){
 apro_mt_pwgtm <- get_apro_mt_pwgtm()
 
 
+
+
 # write downloaded and processed data to Excel 
+
 
 # save data extraction also in R data format
 # Add time stamp (day) to indicate the date of extraction
-save(apro_mt_pwgtm, file = paste("data/apro_mt_pwgtm_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
+save(apro_mt_pwgtm, file = paste(extraction_folder,"apro_mt_pwgtm_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
 
 
 
@@ -69,7 +76,8 @@ save(apro_mt_pwgtm, file = paste("data/apro_mt_pwgtm_", format(Sys.time(), "%Y-%
 # Therefore, we first sort the table from 1960 to the latest year (increasing order)
 #! need a filter on years!! >2010
 
-load("data/apro_mt_pwgtm_2023-09-18.RData")
+# load table if not in memory already
+#load(paste(extraction_folder,"data/apro_mt_pwgtm_2023-09-18.RData", sep = ""))
 
 # only get the EU countries
 EU_contries <- c(
@@ -111,13 +119,13 @@ apro_mt_pwgtm <- apro_mt_pwgtm %>% filter(geo %in% EU_contries)
 
 excel_out <- apro_mt_pwgtm %>% arrange(time) %>% pivot_wider(names_from = time)
 
-write.xlsx(as.data.frame(excel_out), file = "apro_mt_pwgtm_fromR.xlsx", 
+write.xlsx(as.data.frame(excel_out), file = paste(extraction_folder,"apro_mt_pwgtm_fromR.xlsx",sep = ""), 
            row.names = FALSE, col.names = TRUE, sheetName = "apro_mt_pwgtm",
            showNA = TRUE)
 
 # add timestamp
 timestamp <- format(Sys.time(), "data extracted on %Y.%m.%d-%H:%M:%S")
-write.xlsx(timestamp, file = "apro_mt_pwgtm_fromR.xlsx", 
+write.xlsx(timestamp, file = paste(extraction_folder,"apro_mt_pwgtm_fromR.xlsx",sep = ""), 
            row.names = FALSE, col.names = TRUE, sheetName = "timestamp",
            showNA = TRUE, append = TRUE)
 
