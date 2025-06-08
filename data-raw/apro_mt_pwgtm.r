@@ -7,7 +7,7 @@ library(xlsx)
 library(restatapi)
 
 # output folder on U: drive
-extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2024_2/Eurostat download with R/"
+extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2025_1/Eurostat download with R/"
 
 
 # PART I - Get the data
@@ -129,17 +129,24 @@ write.xlsx(timestamp, file = paste(extraction_folder,"apro_mt_pwgtm_fromR.xlsx",
            row.names = FALSE, col.names = TRUE, sheetName = "timestamp",
            showNA = TRUE, append = TRUE)
 
+
+#====================================================
 # PART II - Check for data updates at Eurostat server
 #====================================================
 
+rm(apro_mt_pwgtm)
+
 # load the old file... 
-load(file = "data/apro_mt_pwgtm_2023-09-12.RData")
+old_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2024_2/Eurostat download with R/"
+load(file = paste(old_folder,"apro_mt_pwgtm_2024-09-09.RData",sep = ""))
 old <- apro_mt_pwgtm
+rm(apro_mt_pwgtm)
 
 # then use the code above: go to Eurostat and grab the latest version
 # save the new apro_mt_pwgtm dataset on 'new'
-load(file = "data/apro_mt_pwgtm_2023-09-18.RData")
+load(file = paste(extraction_folder,"apro_mt_pwgtm_2025-06-08.RData",sep = ""))
 new <- apro_mt_pwgtm
+rm(apro_mt_pwgtm)
 
 # merge the old and the new versions and check what was updated
 x <- new %>% left_join(old, by = c("varlabel","meat","unit","geo","time"))
@@ -150,7 +157,7 @@ data_update3 <- x %>% filter(is.na(value.x)) %>% filter(!is.na(value.y))
 data_update <- rbind(data_update1, data_update2, data_update3)
 
 # save data update
-save(data_update, file = paste("data/apro_mt_pwgtm_update", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
+save(data_update, file = paste(extraction_folder,"apro_mt_pwgtm_update", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
 
 # clean up
 rm(data_update, data_update1, data_update3, data_update2, x, old, new)
