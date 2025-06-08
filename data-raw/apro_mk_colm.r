@@ -5,7 +5,7 @@ library(xlsx)
 library(restatapi)
 
 # output folder on U: drive
-extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2024_2/Eurostat download with R/"
+extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2025_1/Eurostat download with R/"
 
 # PART I - Get the data
 #======================
@@ -83,13 +83,14 @@ save(apro_mk_colm, file = paste(extraction_folder,"apro_mk_colm_", format(Sys.ti
 rm(apro_mk_colm)
 
 # load the old file... 
-load(file = paste(extraction_folder,"apro_mk_colm_2024-07-02.RData",sep = ""))
+old_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2024_2/Eurostat download with R/"
+load(file = paste(old_folder,"apro_mk_colm_2024-08-30.RData",sep = ""))
 old <- apro_mk_colm
 rm(apro_mk_colm)
 
 # then use the code above: go to Eurostat and grab the latest version
 # save the new apro_mk_colm dataset on 'new'
-load(file = paste(extraction_folder,"apro_mk_colm_2024-08-20.RData",sep = ""))
+load(file = paste(extraction_folder,"apro_mk_colm_2025-06-08.RData",sep = ""))
 new <- apro_mk_colm
 rm(apro_mk_colm)
 
