@@ -27,7 +27,7 @@ get_apro_mk_colm <- function(){
   
   # create a variable name by combining (geo,dairyprod,milkitem)
   # this will be used in the vlookup's in Excel...
-  apro_mk_colm <- apro_mk_colm %>% mutate(varname = str_c(geo,dairyprod,unit, sep = "_"))
+  apro_mk_colm <- apro_mk_colm %>% mutate(varname = str_c(geo,dairyprod,unit,milkitem, sep = "_"))
   
   #get dictionary
   apro_mk_colm_dic <- get_eurostat_dsd(id = "apro_mk_colm")
@@ -38,7 +38,10 @@ get_apro_mk_colm <- function(){
   # merge to get the labels
   apro_mk_colm <- apro_mk_colm %>% left_join(mk_colm_dairyprod, by = c("dairyprod"="code"))
   apro_mk_colm <- apro_mk_colm %>% mutate(varlabel = str_c(geo,name, sep = "_"))
-  
+ 
+  # merge unit and milkitem (e.g. to get PC_FAT from PC and FAT)
+  apro_mk_colm <- apro_mk_colm %>% mutate(unit=str_c(unit,milkitem, sep = "_"))
+ 
   # select only the columns we need
   apro_mk_colm <- apro_mk_colm %>% select(varname,varlabel,dairyprod,unit,geo,time,values)
   
@@ -90,7 +93,7 @@ rm(apro_mk_colm)
 
 # then use the code above: go to Eurostat and grab the latest version
 # save the new apro_mk_colm dataset on 'new'
-load(file = paste(extraction_folder,"apro_mk_colm_2025-06-08.RData",sep = ""))
+load(file = paste(extraction_folder,"apro_mk_colm_2025-06-09.RData",sep = ""))
 new <- apro_mk_colm
 rm(apro_mk_colm)
 
