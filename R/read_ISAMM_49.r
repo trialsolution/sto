@@ -25,11 +25,14 @@ isamm_filename <- "Milk_Monthly_Deliveries (R. 479-2010) CSV.xlsm"
 
 isamm <- read_excel(paste(read_folder,isamm_filename, sep = ""),
                     sheet = "Summary (CSV-Mkt-trans)", 
-                    range = "A4:AB111",
+                    range = "B4:AC128",
                     col_types = c("date",rep("numeric",27)))
+
+colnames(isamm)[1] <- "date"
 
 # put countries in rows
 isamm <- isamm %>% pivot_longer(cols = 2:ncol(isamm), names_to = "countries")
+
 
 # add year as column
 isamm$year <- as.numeric(format(isamm$date, format="%Y"))

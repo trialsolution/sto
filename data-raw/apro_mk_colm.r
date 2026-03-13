@@ -5,7 +5,7 @@ library(xlsx)
 library(restatapi)
 
 # output folder on U: drive
-extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2025_1/Eurostat download with R/"
+extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2025_2/Eurostat download with R/"
 
 # PART I - Get the data
 #======================
