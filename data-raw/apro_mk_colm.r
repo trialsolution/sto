@@ -1,11 +1,21 @@
 
-library(eurostat)
 library(tidyverse)
 library(xlsx)
 library(restatapi)
 
 # output folder on U: drive
-extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2025_2/Eurostat download with R/"
+extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2026_1/Eurostat download with R/"
+
+# local output folder
+extraction_folder <- "c:/Users/himicmi/Downloads/eurostat/Eurostat download with R/"
+
+#
+# get the date of last update
+# this will define the name of the output file to track changes of the EUROSTAT versions
+#
+s_update <- search_eurostat_toc("milk") |> filter(code == "apro_mk_colm")
+s_update$lastUpdate
+
 
 # PART I - Get the data
 #======================
@@ -14,16 +24,19 @@ extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/
 #
 get_apro_mk_colm <- function(){
   
-  apro_mk_colm <- get_eurostat(id="apro_mk_colm")
+  apro_mk_colm <- get_eurostat_data(id="apro_mk_colm")
   apro_mk_colm <- as_tibble(apro_mk_colm)
   
   # get only the data after 2010
-  apro_mk_colm$year <-  as.numeric(format(apro_mk_colm$TIME_PERIOD, format="%Y"))
+  apro_mk_colm$year <-  as.numeric(substring(as.character(apro_mk_colm$time), 1, 4))
   apro_mk_colm <- apro_mk_colm %>% filter(year > 2009)
   apro_mk_colm <- apro_mk_colm %>% select(-year)
   
-  # convert the format of the dates (we only need years)
-  apro_mk_colm$time <-  format(apro_mk_colm$TIME_PERIOD, format="%YM%m")
+  
+  
+  # convert the format of the dates (year_M_month)
+  apro_mk_colm$time <-  gsub("-","M",apro_mk_colm$time)
+
   
   # create a variable name by combining (geo,dairyprod,milkitem)
   # this will be used in the vlookup's in Excel...
@@ -59,25 +72,9 @@ apro_mk_colm <- get_apro_mk_colm()
 
 # write downloaded and processed data to Excel 
 
-# Note that pivot_wider would put the columns/years in the order of the first appearance
-# Therefore, we first sort the table from 1960 to the latest year (increasing order)
-#! need a filter on years!! >2010
-excel_out <- apro_mk_colm %>% arrange(time) %>% pivot_wider(names_from = time)
+source("R/save_to_excel.r")
 
-write.xlsx(as.data.frame(excel_out), file = paste(extraction_folder,"apro_mk_colm_fromR.xlsx",sep = ""), 
-           row.names = FALSE, col.names = TRUE, sheetName = "apro_mk_colm",
-           showNA = TRUE)
-
-# add timestamp
-timestamp <- format(Sys.time(), "data extracted on %Y.%m.%d-%H:%M:%S")
-write.xlsx(timestamp, file = paste(extraction_folder,"apro_mk_colm_fromR.xlsx",sep = ""), 
-           row.names = FALSE, col.names = TRUE, sheetName = "timestamp",
-           showNA = TRUE, append = TRUE)
-
-# save data extraction also in R data format
-# Add time stamp (day) to indicate the date of extraction
-#save(apro_mk_colm, file = "data/apro_mk_colm.RData")
-save(apro_mk_colm, file = paste(extraction_folder,"apro_mk_colm_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
+save_to_excel(tibble_to_save = apro_mk_colm, folder_to_save = extraction_folder)
 
 
 # PART II - Check for data updates at Eurostat server

@@ -32,6 +32,10 @@ dir.create(file.path(main_STO_dir, sub_STO_dir))
 
 extraction_folder <- paste(main_STO_dir,"/",sub_STO_dir, sep = "")
 
+# option B: use a local folder
+extraction_folder <- "c:/Users/himicmi/Downloads/eurostat/Eurostat download with R/"
+
+
 #
 # get the data
 #
@@ -80,32 +84,16 @@ apro_mk_pobta <- apro_mk_pobta %>% mutate(varlabel = str_c(geo,name,milkitem, se
 apro_mk_pobta <- apro_mk_pobta %>% select(varname,varlabel,dairyprod,milkitem,geo,time,values)
 colnames(apro_mk_pobta)[7] <- "value"
 
-#
-# Note that pivot_wider would put the columns/years in the order of the first appearance
-# Therefore, we first sort the table from 1960 to the latest year (increasing order)
-#
-excel_out <- apro_mk_pobta %>% filter(time > 1989) %>% arrange(time) %>% pivot_wider(names_from = time)
 
-#
-# create an Excel file for further processing
-# write.xlsx2 would be faster, but we could not keep the missing values (NA) in the Excel file
-# so the preferred option is to use write.xlsx, even if that's slower
-#write.xlsx2(as.data.frame(excel_out), file = "apro_mk_pobta_fromR.xlsx", row.names = FALSE, col.names = TRUE, sheetName = "apro_mk_pobta")
+# save to Excel
+apro_mk_pobta <- apro_mk_pobta %>% filter(time > 1989) 
 
-# write to Excel 
-write.xlsx(as.data.frame(excel_out), file = paste(extraction_folder,"/apro_mk_pobta_fromR.xlsx",sep = ""), 
-            row.names = FALSE, col.names = TRUE, sheetName = "apro_mk_pobta",
-            showNA = TRUE)
+source("R/save_to_excel.r")
 
-# add date of last data update on Eurostat
-write.xlsx(s_update$lastUpdate, file = paste(extraction_folder,"/apro_mk_pobta_fromR.xlsx",sep = ""), 
-           row.names = FALSE, col.names = TRUE, sheetName = "releasedate",
-           showNA = TRUE, append = TRUE)
+save_to_excel(tibble_to_save = apro_mk_pobta, folder_to_save = extraction_folder)
 
 
-# save data extraction also in R data format
-save(apro_mk_pobta, file = paste(extraction_folder,"/apro_mk_pobta_", 
-                                 as.character(s_update$lastUpdate), ".RData", sep = ""))
+# save also the dictionary of this Eurostat release
 save(apro_mk_pobta_dic, file = paste(extraction_folder,"/apro_mk_pobta_dic_", 
                                      as.character(s_update$lastUpdate), ".RData", sep = ""))
 

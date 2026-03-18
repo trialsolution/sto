@@ -1,13 +1,23 @@
 # get slaughtering statistics from Eurostat
 # Cows and heifers
 
-library(eurostat)
 library(tidyverse)
 library(xlsx)
 library(restatapi)
 
 # output folder on U: drive
 extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2025_1/Eurostat download with R/"
+
+# local output folder
+extraction_folder <- "c:/Users/himicmi/Downloads/eurostat/Eurostat download with R/"
+
+
+#
+# get the date of last update
+# this will define the name of the output file to track changes of the EUROSTAT versions
+#
+s_update <- search_eurostat_toc("slaughter") |> filter(code == "apro_mt_pwgtm")
+s_update$lastUpdate
 
 
 # PART I - Get the data
@@ -17,16 +27,16 @@ extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/
 #
 get_apro_mt_pwgtm <- function(){
   
-  apro_mt_pwgtm <- get_eurostat(id="apro_mt_pwgtm")
+  apro_mt_pwgtm <- get_eurostat_data(id="apro_mt_pwgtm")
   apro_mt_pwgtm <- as_tibble(apro_mt_pwgtm)
   
   # get only the data after 2010
-  apro_mt_pwgtm$year <-  as.numeric(format(apro_mt_pwgtm$TIME_PERIOD, format="%Y"))
+  apro_mt_pwgtm$year <-  as.numeric(substring(as.character(apro_mt_pwgtm$time), 1, 4))
   apro_mt_pwgtm <- apro_mt_pwgtm %>% filter(year > 2009)
   apro_mt_pwgtm <- apro_mt_pwgtm %>% select(-year)
   
   # convert the format of the dates (we only need years)
-  apro_mt_pwgtm$time <-  format(apro_mt_pwgtm$TIME_PERIOD, format="%YM%m")
+  apro_mt_pwgtm$time <-  gsub("-","M",apro_mt_pwgtm$time)
   
   # drop meat item (always SL)
   apro_mt_pwgtm <-  apro_mt_pwgtm %>% select(-meatitem)
@@ -68,13 +78,10 @@ apro_mt_pwgtm <- get_apro_mt_pwgtm()
 
 # save data extraction also in R data format
 # Add time stamp (day) to indicate the date of extraction
-save(apro_mt_pwgtm, file = paste(extraction_folder,"apro_mt_pwgtm_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
+save(apro_mt_pwgtm, file = paste(extraction_folder,"apro_mt_pwgtm_", as.character(s_update$lastUpdate), ".RData", sep = ""))
 
 
 
-# Note that pivot_wider would put the columns/years in the order of the first appearance
-# Therefore, we first sort the table from 1960 to the latest year (increasing order)
-#! need a filter on years!! >2010
 
 # load table if not in memory already
 #load(paste(extraction_folder,"data/apro_mt_pwgtm_2023-09-18.RData", sep = ""))
@@ -117,17 +124,11 @@ EU_contries <- c(
 
 apro_mt_pwgtm <- apro_mt_pwgtm %>% filter(geo %in% EU_contries)
 
-excel_out <- apro_mt_pwgtm %>% arrange(time) %>% pivot_wider(names_from = time)
+# write downloaded and processed data to Excel 
+source("R/save_to_excel.r")
 
-write.xlsx(as.data.frame(excel_out), file = paste(extraction_folder,"apro_mt_pwgtm_fromR.xlsx",sep = ""), 
-           row.names = FALSE, col.names = TRUE, sheetName = "apro_mt_pwgtm",
-           showNA = TRUE)
+save_to_excel(tibble_to_save = apro_mt_pwgtm, folder_to_save = extraction_folder)
 
-# add timestamp
-timestamp <- format(Sys.time(), "data extracted on %Y.%m.%d-%H:%M:%S")
-write.xlsx(timestamp, file = paste(extraction_folder,"apro_mt_pwgtm_fromR.xlsx",sep = ""), 
-           row.names = FALSE, col.names = TRUE, sheetName = "timestamp",
-           showNA = TRUE, append = TRUE)
 
 
 #====================================================

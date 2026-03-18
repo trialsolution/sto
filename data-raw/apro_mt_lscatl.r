@@ -1,6 +1,5 @@
 # get EUROSTAT data on the dairy herd
 
-library(eurostat)
 library(tidyverse)
 library(xlsx)
 library(restatapi)
@@ -8,20 +7,34 @@ library(restatapi)
 # output folder on U: drive
 extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2025_1/Eurostat download with R/"
 
+# option B: use a local folder
+extraction_folder <- "c:/Users/himicmi/Downloads/eurostat/2026_1/Eurostat download with R/"
+
 
 
 # DOWNLOAD DATA
 #--------------
 
-apro_mt_lscatl <- get_eurostat(id="apro_mt_lscatl")
+apro_mt_lscatl <- get_eurostat_data(id="apro_mt_lscatl")
 apro_mt_lscatl <- as_tibble(apro_mt_lscatl)
 
+
+#
+# get the date of last update
+# this will define the name of the output file to track changes of the EUROSTAT versions
+#
+s_update <- search_eurostat_toc("Bovine") |> filter(code == "apro_mt_lscatl")
+s_update$lastUpdate
 
 # PROCESS AND REARRANGE DATA
 #---------------------------
 
 # convert the format of the dates (we only need years)
-apro_mt_lscatl$TIME_PERIOD <-  as.numeric(format(apro_mt_lscatl$TIME_PERIOD, format="%Y"))
+apro_mt_lscatl$time <- as.numeric(levels(apro_mt_lscatl$time))[apro_mt_lscatl$time]
+apro_mt_lscatl$animals <-  as.character(apro_mt_lscatl$animals)
+apro_mt_lscatl$month <-  as.character(apro_mt_lscatl$month)
+apro_mt_lscatl$geo <-  as.character(apro_mt_lscatl$geo)
+
 
 # create a variable name by combining (geo,animals,month)
 # month here refers to the month of the survey: either May-June or December
@@ -50,41 +63,25 @@ apro_mt_lscatl <- apro_mt_lscatl %>% mutate(varlabel = str_c(geo,name,unit, sep 
 
 
 # select only the columns we need
-apro_mt_lscatl <- apro_mt_lscatl %>% select(varname,varlabel,animals,month,unit,geo,TIME_PERIOD,values)
+apro_mt_lscatl <- apro_mt_lscatl %>% select(varname,varlabel,animals,month,unit,geo,time,values)
 
 # rearrange to have the years in the columns
 colnames(apro_mt_lscatl)[8] <- "value"
-colnames(apro_mt_lscatl)[7] <- "time"
 
 
 
 # WRITE OUT TO EXCEL
 #-------------------
 
-# Note that pivot_wider would put the columns/years in the order of the first appearance
-# Therefore, we first sort the table from 1960 to the latest year (increasing order)
-excel_out <- apro_mt_lscatl %>% filter(time > 1989) %>% arrange(time) %>% pivot_wider(names_from = time)
+apro_mt_lscatl <- apro_mt_lscatl %>% filter(time > 1989)
 
+source("R/save_to_excel.r")
 
-# write to Excel file for further processing
-# write.xlsx2 would be faster, but we could not keep the missing values (NA) in the Excel file
-# so the preferred option is to use write.xlsx, even if that's slower
-#write.xlsx2(as.data.frame(excel_out), file = "apro_mt_lscatl_fromR.xlsx", row.names = FALSE, col.names = TRUE, sheetName = "apro_mt_lscatl")
+save_to_excel(tibble_to_save = apro_mt_lscatl, folder_to_save = extraction_folder)
 
-# write to Excel 
-write.xlsx(as.data.frame(excel_out), file = paste(extraction_folder,"apro_mt_lscatl_fromR.xlsx", sep = ""),
-           row.names = FALSE, col.names = TRUE, sheetName = "apro_mt_lscatl",
-           showNA = TRUE)
-
-# add timestamp
-timestamp <- format(Sys.time(), "data extracted on %Y.%m.%d-%H:%M:%S")
-write.xlsx(timestamp, file = paste(extraction_folder, "apro_mt_lscatl_fromR.xlsx", sep = ""),
-           row.names = FALSE, col.names = TRUE, sheetName = "timestamp",
-           showNA = TRUE, append = TRUE)
 
 # save data extraction also in R data format
-save(apro_mt_lscatl, file = paste(extraction_folder, "apro_mt_lscatl_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
-save(apro_mt_lscatl_dic, file = paste(extraction_folder, "apro_mt_lscatl_dic_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
+save(apro_mt_lscatl_dic, file = paste(extraction_folder, "apro_mt_lscatl_dic_", as.character(s_update$lastUpdate), ".RData", sep = ""))
 
 
 # PART II - Check for data updates at Eurostat server

@@ -5,8 +5,10 @@ library(tidyverse)
 library(xlsx)
 
 # output folder on U: drive
-extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2025_2/Eurostat download with R/"
+extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2026_1/Eurostat download with R/"
 
+# local output folder
+extraction_folder <- "c:/Users/himicmi/Downloads/eurostat/Eurostat download with R/"
 
 # get data from data portal API
 json_data <- fromJSON("https://ec.europa.eu/agrifood/api/dairy/production?memberStateCodes=AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,EL,HU,IE,IT,LV,LT,MT,NL,PL,PT,RO,SK,SI,ES,SE&years=2021,2022,2023,2024,2025")
@@ -181,9 +183,15 @@ evolution <- df %>% group_by(year,memberStateCode) %>%
             fat_mean=weighted.mean(fat,production,na.rm=TRUE))
 
 # to excel
-write.xlsx(as.data.frame(evolution), file = paste(extraction_folder,"protein_evolution_fromR.xlsx",sep = ""), 
+write.xlsx(as.data.frame(evolution), file = paste(extraction_folder,"milk_solids_evolution_fromR.xlsx",sep = ""), 
            row.names = FALSE, col.names = TRUE, sheetName = "dataportal",
            showNA = TRUE)
+
+# save data extraction also in R data format
+# Add time stamp (day) to indicate the date of extraction
+save(evolution, file = paste(extraction_folder,"milk_solids_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
+
+
 
 #--------------------------
 # 5. Annual milk deliveries
@@ -206,3 +214,6 @@ write.xlsx(as.data.frame(isamm_annual), file = paste(extraction_folder,"isamm_an
            row.names = FALSE, col.names = TRUE, sheetName = "dataportal",
            showNA = TRUE)
 
+# save data extraction also in R data format
+# Add time stamp (day) to indicate the date of extraction
+save(isamm_annual, file = paste(extraction_folder,"isamm_annual_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
