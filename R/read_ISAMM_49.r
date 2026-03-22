@@ -10,10 +10,10 @@ library(xlsx)
 # General settings
 #
 
-read_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/Database/EUROSTAT monthly/"
+read_folder <- "C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_1/data from E3/"
 
 #extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2024_2/Eurostat download with R/"
-extraction_folder <- read_folder
+extraction_folder <- "C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/Database/EUROSTAT monthly/"
 
 # file provided by E3 (Damien)
 isamm_filename <- "Milk_Monthly_Deliveries (R. 479-2010) CSV.xlsm"
@@ -22,10 +22,11 @@ isamm_filename <- "Milk_Monthly_Deliveries (R. 479-2010) CSV.xlsm"
 #
 # Load and process data
 #
-
+# Note that the range needs to be adopted manually for every STO
+#
 isamm <- read_excel(paste(read_folder,isamm_filename, sep = ""),
                     sheet = "Summary (CSV-Mkt-trans)", 
-                    range = "B4:AC128",
+                    range = "B4:AC134",
                     col_types = c("date",rep("numeric",27)))
 
 colnames(isamm)[1] <- "date"
