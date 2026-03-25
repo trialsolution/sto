@@ -18,7 +18,7 @@ save_to_excel <- function(tibble_to_save,folder_to_save){
   # write to Excel 
   write.xlsx(as.data.frame(excel_out), 
              file = paste(folder_to_save,"/", print(substitute(tibble_to_save)), "_fromR.xlsx",sep = ""), 
-             row.names = FALSE, col.names = TRUE, sheetName = print(substitute(tibble_to_save)),
+             row.names = FALSE, col.names = TRUE, sheetName = paste(print(substitute(tibble_to_save))),
              showNA = TRUE)
   
   # add date of last data update on Eurostat
