@@ -5,11 +5,9 @@ library(tidyverse)
 library(xlsx)
 library(restatapi)
 
-# output folder on U: drive
-extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2025_1/Eurostat download with R/"
 
 # local output folder
-extraction_folder <- "c:/Users/himicmi/Downloads/eurostat/Eurostat download with R/"
+extraction_folder <- "C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_1/Eurostat download with R/"
 
 
 #
