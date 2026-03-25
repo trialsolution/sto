@@ -39,6 +39,31 @@ isamm <- isamm %>% select(-category, -unit)
 
 
 #
+# write monthly isamm data (as retrieved from the data portal) to Excel
+#
+
+excel_out <- isamm |> arrange(time) |> pivot_wider(names_from = time, values_from = production)
+
+
+#
+# save table as EXcel file
+#
+
+write.xlsx(as.data.frame(excel_out), file = paste(extraction_folder,"isamm_49_monthly.xlsx",sep = ""), 
+           row.names = FALSE, col.names = TRUE, sheetName = "isamm_49_monthly",
+           showNA = TRUE)
+
+# add timestamp
+timestamp <- format(Sys.time(), "data extracted on %Y.%m.%d-%H:%M:%S")
+
+# save to disk
+write.xlsx(timestamp, file = paste(extraction_folder,"isamm_49_monthly.xlsx",sep = ""), 
+           row.names = FALSE, col.names = TRUE, sheetName = "timestamp",
+           showNA = TRUE, append = TRUE)
+
+
+
+#
 # 2. Get apro_mk_colm
 #
 
