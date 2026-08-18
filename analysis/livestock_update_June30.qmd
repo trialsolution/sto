@@ -1,0 +1,48 @@
+---
+title: "Livestock update 30.06.2026"
+format: html
+editor: visual
+---
+
+## Context
+
+After the summer STO finalized, there was a Eurostat update on the livestock population. This is the apro_mt_lscatl domain. I'm wondering if this introduces a significant change compared to our published STO numbers - dairy cows and yields.
+
+## Data preparation
+
+The usual comparison code in apro_mt_lscatl.r. This generates the data_update tibble.
+
+## Number of dairy cows
+
+```{r}
+#| echo: FALSE 
+options(tidyverse.quiet = TRUE)
+library(tidyverse)
+load("c:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_3/Eurostat download with R/apro_mt_lscatl_update2026-08-18.RData")
+```
+
+```{r}
+data_update <- data_update %>% mutate(diff = value_new - value_old)
+data_update %>% filter(animals == "A2300F", month =="M11_M12") %>% select(geo, unit_new, value_new, value_old, diff) %>% filter(abs(diff) > 1)
+```
+
+Note that the differences in cow numbers after the update are relevant mainly for EL, IT and RO. For IT, we use CLAL, so this update is not relevant.
+
+We can also calculate the EU-level difference this update introduces. Either by ignoring IT, as we do in the balance sheet (as it does not come from Eurostat-apro_mt_lscatl, or not. Dairy cows are under code A2300F.
+
+Without Italy:
+
+```{r}
+# list of countries in EU-27 minus IT
+# note that only countries in the data_update tibble are considered, not the full list of 27 countries
+EU_wo_IT <- c("BG","CZ","EE","EL","FR","HU","LT","PL","RO","SI","SK","CY","HR","SE")
+
+# differences without IT
+data_update %>% filter(geo %in% EU_wo_IT, animals == "A2300F") %>% group_by(animals,month,time) %>% summarise(diff=sum(diff, na.rm = FALSE))
+```
+
+With Italy:
+
+```{r}
+data_update %>% filter(geo %in% c(EU_wo_IT,"IT"), animals == "A2300F") %>% group_by(animals,month,time) %>% summarise(diff=sum(diff, na.rm = FALSE))
+```
