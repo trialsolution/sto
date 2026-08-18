@@ -4,7 +4,7 @@ library(tidyverse)
 library(xlsx)
 library(restatapi)
 
-extraction_folder <- "C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_2/Eurostat download with R/"
+extraction_folder <- "C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_3/Eurostat download with R/"
 
 
 
@@ -86,13 +86,13 @@ save(apro_mt_lscatl_dic, file = paste(extraction_folder, "apro_mt_lscatl_dic_", 
 rm(apro_mt_lscatl)
 
 # load the old file... 
-load(file = paste("C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_1/Eurostat download with R/",
-                  "apro_mt_lscatl_2026.03.17.RData",sep = ""))
+load(file = paste("C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_2/Eurostat download with R/",
+                  "apro_mt_lscatl_2026.03.18.RData",sep = ""))
 old <- tibble_to_save
 rm(tibble_to_save)
 
 # save the new apro_mt_lscatl dataset on 'new'
-load(file = paste(extraction_folder,"apro_mt_lscatl_2026.03.18.RData",sep = ""))
+load(file = paste(extraction_folder,"apro_mt_lscatl_2026.07.15.RData",sep = ""))
 new <- tibble_to_save
 rm(tibble_to_save)
 
@@ -105,8 +105,10 @@ data_update3 <- x %>% filter(is.na(value.x)) %>% filter(!is.na(value.y))
 data_update <- rbind(data_update1, data_update2, data_update3)
 
 # give meaningful variable names
-colnames(data_update)[7] <- "value_new"
-colnames(data_update)[8] <- "value_old"
+colnames(data_update)[5]  <- "unit_new"
+colnames(data_update)[8]  <- "value_new"
+colnames(data_update)[9]  <- "unit_old"
+colnames(data_update)[10] <- "value_old"
 
 
 # save data update
@@ -114,6 +116,5 @@ save(data_update, file = paste(extraction_folder,"apro_mt_lscatl_update", format
 
 # clean up
 rm(data_update, data_update1, data_update3, data_update2, x, old, new)
-
 
 
