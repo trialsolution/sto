@@ -5,11 +5,8 @@ library(tidyverse)
 library(xlsx)
 
 
-# output folder on U: drive
-extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2025_1/Eurostat download with R/"
-
 # option B: use a local folder
-extraction_folder <- "c:/Users/himicmi/Downloads/eurostat/2026_1/Eurostat download with R/"
+extraction_folder <- "C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_2/Eurostat download with R/"
 
 
 #
@@ -88,16 +85,15 @@ save(agriprod, file = paste(extraction_folder,"agriprod_", format(Sys.time(), "%
 rm(apro_mk_farm)
 
 # load the old file... 
-#load(file = paste(extraction_folder,"apro_mk_farm_2024-07-02.RData",sep = ""))
-load(file = paste("C:/Users/himicmi/Downloads/eurostat/data/",
-                  "apro_mk_farm.RData",sep = ""))
-old <- apro_mk_farm
-rm(apro_mk_farm)
+load(file = paste("C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_1/Eurostat download with R/",
+                  "apro_mk_farm_2025.12.04.RData",sep = ""))
+old <- tibble_to_save
+rm(tibble_to_save)
 
 # save the new apro_mk_farm dataset on 'new'
-load(file = paste(extraction_folder,"apro_mk_farm_2025-06-08.RData",sep = ""))
-new <- apro_mk_farm
-rm(apro_mk_farm)
+load(file = paste(extraction_folder,"apro_mk_farm_2025.12.04.RData",sep = ""))
+new <- tibble_to_save
+rm(tibble_to_save)
 
 # merge the old and the new versions and check what was updated
 x <- new %>% left_join(old, by = c("varname","varlabel","dairyprod","milkitem","geo","time"))

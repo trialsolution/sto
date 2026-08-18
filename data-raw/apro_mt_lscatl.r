@@ -4,11 +4,7 @@ library(tidyverse)
 library(xlsx)
 library(restatapi)
 
-# output folder on U: drive
-extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2025_1/Eurostat download with R/"
-
-# option B: use a local folder
-extraction_folder <- "c:/Users/himicmi/Downloads/eurostat/2026_1/Eurostat download with R/"
+extraction_folder <- "C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_2/Eurostat download with R/"
 
 
 
@@ -90,16 +86,15 @@ save(apro_mt_lscatl_dic, file = paste(extraction_folder, "apro_mt_lscatl_dic_", 
 rm(apro_mt_lscatl)
 
 # load the old file... 
-#load(file = paste(extraction_folder,"apro_mt_lscatl_2024-07-02.RData",sep = ""))
-load(file = paste("C:/Users/himicmi/Downloads/eurostat/data/",
-                  "apro_mt_lscatl.RData",sep = ""))
-old <- apro_mt_lscatl
-rm(apro_mt_lscatl)
+load(file = paste("C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_1/Eurostat download with R/",
+                  "apro_mt_lscatl_2026.03.17.RData",sep = ""))
+old <- tibble_to_save
+rm(tibble_to_save)
 
 # save the new apro_mt_lscatl dataset on 'new'
-load(file = paste(extraction_folder,"apro_mt_lscatl_2025-06-08.RData",sep = ""))
-new <- apro_mt_lscatl
-rm(apro_mt_lscatl)
+load(file = paste(extraction_folder,"apro_mt_lscatl_2026.03.18.RData",sep = ""))
+new <- tibble_to_save
+rm(tibble_to_save)
 
 # merge the old and the new versions and check what was updated
 x <- new %>% left_join(old, by = c("varname","varlabel","animals","month","geo","time"))

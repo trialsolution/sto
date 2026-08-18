@@ -3,11 +3,8 @@ library(tidyverse)
 library(xlsx)
 library(restatapi)
 
-# output folder on U: drive
-extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2026_1/Eurostat download with R/"
-
 # local output folder
-extraction_folder <- "c:/Users/himicmi/Downloads/eurostat/Eurostat download with R/"
+extraction_folder <- "C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_2/Eurostat download with R"
 
 #
 # get the date of last update
@@ -71,7 +68,6 @@ apro_mk_colm <- get_apro_mk_colm()
 
 
 # write downloaded and processed data to Excel 
-
 source("R/save_to_excel.r")
 
 save_to_excel(tibble_to_save = apro_mk_colm, folder_to_save = extraction_folder)
@@ -83,16 +79,16 @@ save_to_excel(tibble_to_save = apro_mk_colm, folder_to_save = extraction_folder)
 rm(apro_mk_colm)
 
 # load the old file... 
-old_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2024_2/Eurostat download with R/"
-load(file = paste(old_folder,"apro_mk_colm_2024-08-30.RData",sep = ""))
-old <- apro_mk_colm
-rm(apro_mk_colm)
+old_folder <- "C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_1/Eurostat download with R/"
+load(file = paste(old_folder,"apro_mk_colm_2026.03.16.RData",sep = ""))
+old <- tibble_to_save
+rm(tibble_to_save)
 
 # then use the code above: go to Eurostat and grab the latest version
 # save the new apro_mk_colm dataset on 'new'
-load(file = paste(extraction_folder,"apro_mk_colm_2025-06-09.RData",sep = ""))
-new <- apro_mk_colm
-rm(apro_mk_colm)
+load(file = paste(extraction_folder,"/apro_mk_colm_2026.06.04.RData",sep = ""))
+new <- tibble_to_save
+rm(tibble_to_save)
 
 # merge the old and the new versions and check what was updated
 x <- new %>% left_join(old, by = c("varname","varlabel","dairyprod","unit","geo","time"))

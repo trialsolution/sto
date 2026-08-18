@@ -4,14 +4,12 @@ library(jsonlite)
 library(tidyverse)
 library(xlsx)
 
-# output folder on U: drive
-extraction_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2026_1/Eurostat download with R/"
-
 # local output folder
-extraction_folder <- "c:/Users/himicmi/Downloads/eurostat/Eurostat download with R/"
+extraction_folder <- "C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_2/Eurostat download with R/"
+
 
 # get data from data portal API
-json_data <- fromJSON("https://ec.europa.eu/agrifood/api/dairy/production?memberStateCodes=AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,EL,HU,IE,IT,LV,LT,MT,NL,PL,PT,RO,SK,SI,ES,SE&years=2021,2022,2023,2024,2025")
+json_data <- fromJSON("https://ec.europa.eu/agrifood/api/dairy/production?memberStateCodes=AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,EL,HU,IE,IT,LV,LT,MT,NL,PL,PT,RO,SK,SI,ES,SE&years=2021,2022,2023,2024,2025,2026")
 
 df <- as_tibble(json_data)
 
@@ -76,7 +74,7 @@ write.xlsx(timestamp, file = paste(extraction_folder,"portal_deliveries_fromR.xl
 
 # save data extraction also in R data format
 # Add time stamp (day) to indicate the date of extraction
-save(deliver, file = paste(extraction_folder,"deliver_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
+save(deliver, file = paste(extraction_folder,"/deliver_", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
 
 
 # 1 - b.
@@ -97,7 +95,7 @@ write.xlsx(timestamp, file = paste(extraction_folder,"portal_deliveries_yoy_from
 
 # save data extraction also in R data format
 # Add time stamp (day) to indicate the date of extraction
-save(deliver_yoy, file = paste(extraction_folder,"deliver_yoy", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
+save(deliver_yoy, file = paste(extraction_folder,"/deliver_yoy", format(Sys.time(), "%Y-%m-%d"), ".RData", sep = ""))
 
 # 1 - c.
 # deliveries, cumulative monthly changes (Jan. to current month), year on year (%)
@@ -170,7 +168,7 @@ save(protein, file = paste(extraction_folder,"protein_", format(Sys.time(), "%Y-
 #--------------------------
 
 
-json_data <- fromJSON("https://ec.europa.eu/agrifood/api/dairy/production?memberStateCodes=AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,EL,HU,IE,IT,LV,LT,MT,NL,PL,PT,RO,SK,SI,ES,SE&years=2021,2022,2023,2024,2025")
+json_data <- fromJSON("https://ec.europa.eu/agrifood/api/dairy/production?memberStateCodes=AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,EL,HU,IE,IT,LV,LT,MT,NL,PL,PT,RO,SK,SI,ES,SE&years=2021,2022,2023,2024,2025,2026")
 
 df <- as_tibble(json_data)
 
@@ -196,7 +194,7 @@ save(evolution, file = paste(extraction_folder,"milk_solids_", format(Sys.time()
 #--------------------------
 # 5. Annual milk deliveries
 #--------------------------
-json_data <- fromJSON("https://ec.europa.eu/agrifood/api/dairy/production?memberStateCodes=AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,EL,HU,IE,IT,LV,LT,MT,NL,PL,PT,RO,SK,SI,ES,SE&years=2021,2022,2023,2024,2025")
+json_data <- fromJSON("https://ec.europa.eu/agrifood/api/dairy/production?memberStateCodes=AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,EL,HU,IE,IT,LV,LT,MT,NL,PL,PT,RO,SK,SI,ES,SE&years=2021,2022,2023,2024,2025,2026")
 
 df <- as_tibble(json_data)
 

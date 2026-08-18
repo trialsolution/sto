@@ -7,7 +7,7 @@ library(restatapi)
 
 
 # local output folder
-extraction_folder <- "C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_1/Eurostat download with R/"
+extraction_folder <- "C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_2/Eurostat download with R/"
 
 
 #
@@ -136,16 +136,16 @@ save_to_excel(tibble_to_save = apro_mt_pwgtm, folder_to_save = extraction_folder
 rm(apro_mt_pwgtm)
 
 # load the old file... 
-old_folder <- "U:/4-Market Analysis/4-2 Short-Term Outlook/Outlook Dairy/Short term dairy/2024_2/Eurostat download with R/"
-load(file = paste(old_folder,"apro_mt_pwgtm_2024-09-09.RData",sep = ""))
-old <- apro_mt_pwgtm
-rm(apro_mt_pwgtm)
+old_folder <- "C:/Users/himicmi/OneDrive - European Commission/GRP-AGRI-A2 - Documents/Market Analysis and Outlook/05. Short Term Market Forecasts/Dairy/eurostat/2026_1/Eurostat download with R/"
+load(file = paste(old_folder,"apro_mt_pwgtm_2026.03.23.RData",sep = ""))
+old <- tibble_to_save
+rm(tibble_to_save)
 
 # then use the code above: go to Eurostat and grab the latest version
 # save the new apro_mt_pwgtm dataset on 'new'
-load(file = paste(extraction_folder,"apro_mt_pwgtm_2025-06-08.RData",sep = ""))
-new <- apro_mt_pwgtm
-rm(apro_mt_pwgtm)
+load(file = paste(extraction_folder,"apro_mt_pwgtm_2026.06.04.RData",sep = ""))
+new <- tibble_to_save
+rm(tibble_to_save)
 
 # merge the old and the new versions and check what was updated
 x <- new %>% left_join(old, by = c("varlabel","meat","unit","geo","time"))
