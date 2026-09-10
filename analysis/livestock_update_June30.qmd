@@ -26,11 +26,11 @@ data_update <- data_update %>% mutate(diff = value_new - value_old)
 data_update %>% filter(animals == "A2300F", month =="M11_M12") %>% select(geo, unit_new, value_new, value_old, diff) %>% filter(abs(diff) > 1)
 ```
 
-Note that the differences in cow numbers after the update are relevant mainly for EL, IT and RO. For IT, we use CLAL, so this update is not relevant.
+Note that the differences in cow numbers after the update are relevant mainly for EL, IT and RO. For IT, we use CLAL, so this EUROSTAT update does not introduce a relevant change at the EU aggregate level.
 
-We can also calculate the EU-level difference this update introduces. Either by ignoring IT, as we do in the balance sheet (as it does not come from Eurostat-apro_mt_lscatl, or not. Dairy cows are under code A2300F.
+We can also calculate the EU-level difference this update introduces. Either by excluding IT, as we do in the balance sheet (as it does not come from Eurostat-apro_mt_lscatl, or not. Dairy cows are under code A2300F.
 
-Without Italy:
+When excluding Italy, the difference:
 
 ```{r}
 # list of countries in EU-27 minus IT
@@ -41,7 +41,7 @@ EU_wo_IT <- c("BG","CZ","EE","EL","FR","HU","LT","PL","RO","SI","SK","CY","HR","
 data_update %>% filter(geo %in% EU_wo_IT, animals == "A2300F") %>% group_by(animals,month,time) %>% summarise(diff=sum(diff, na.rm = FALSE))
 ```
 
-With Italy:
+By including Italy, the difference is:
 
 ```{r}
 data_update %>% filter(geo %in% c(EU_wo_IT,"IT"), animals == "A2300F") %>% group_by(animals,month,time) %>% summarise(diff=sum(diff, na.rm = FALSE))
